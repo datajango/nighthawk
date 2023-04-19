@@ -1,0 +1,18 @@
+[
+    {
+        "section": "NightHawk",
+        "key": "download_folder",
+        "property_type": "directory",
+        "prompt": "Enter the download folder:",
+        "value": null,
+        "default_value": "./downloads"
+    },
+    {
+        "section": "NightHawk",
+        "key": "video_codec",
+        "property_type": "string",
+        "prompt": "Enter the video codec:",
+        "value": null,
+        "default_value": "avc1"
+    }
+]

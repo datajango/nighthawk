@@ -1,0 +1,36 @@
+{
+  // Use IntelliSense to learn about possible attributes.
+  // Hover to view descriptions of existing attributes.
+  // For more information, visit: https://go.microsoft.com/fwlink/?linkid=830387
+  "version": "0.2.0",
+  "configurations": [
+    {
+      "name": "Python: Attach using Process Id",
+      "type": "python",
+      "request": "attach",
+      "processId": "${command:pickProcess}",
+      "justMyCode": true
+    },
+    {
+      "name": "app_01",
+      "type": "python",
+      "request": "launch",
+      "program": "${workspaceFolder}/nighthawk/app_01.py",
+      "console": "integratedTerminal"
+    },
+    {
+      "name": "app_02",
+      "type": "python",
+      "request": "launch",
+      "program": "${workspaceFolder}/nighthawk/app_02.py",
+      "console": "integratedTerminal"
+    },
+    {
+      "name": "add_meta_data",
+      "type": "python",
+      "request": "launch",
+      "program": "${workspaceFolder}/nighthawk/add_meta_data.py",
+      "console": "integratedTerminal"
+    }    
+  ]
+}
