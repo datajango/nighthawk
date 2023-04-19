@@ -14,5 +14,38 @@
         "prompt": "Enter the video codec:",
         "value": null,
         "default_value": "avc1"
+    },
+    {
+        "section": "NightHawk",
+        "key": "project_name",
+        "property_type": "string",
+        "prompt": "Enter the project name:",
+        "value": null,
+        "default_value": "My Project"
+    },
+    {
+        "section": "NightHawk",
+        "key": "project_directory",
+        "property_type": "directory",
+        "prompt": "Enter the project directory:",
+        "value": null,
+        "default_value": "C:/Users/YourUsername/Projects"
+    },
+    {
+        "section": "NightHawk",
+        "key": "enable_feature",
+        "property_type": "checkbox",
+        "prompt": "Enable feature:",
+        "value": null,
+        "default_value": true
+    },
+    {
+        "section": "NightHawk",
+        "key": "color",
+        "property_type": "radio",
+        "prompt": "Choose a color:",
+        "value": null,
+        "options": ["Red", "Green", "Blue"],
+        "default_value": "Red"
     }
 ]

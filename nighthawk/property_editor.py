@@ -1,72 +1,131 @@
+import os
 import tkinter as tk
 from tkinter import filedialog
 
-class PropertyEditor(tk.Toplevel):
-    def __init__(self, root, properties, config):
-        super().__init__(root)
-        self.title('Property Editor')
-        self.config = config
-        self.properties = properties
+class PropertyEditor():
 
-        for index, prop in enumerate(self.properties):
-            label = tk.Label(self, text=prop['prompt'])
-            label.grid(row=index, column=0, sticky='e', padx=5, pady=5)
+    def __init__(self, panel, prop, index):
+        self.panel = panel
+        self.prop = prop
+        self.index = index
+        self.create_ui()
 
-            if prop['property_type'] == 'string':
-                entry = tk.Entry(self)
-                entry.grid(row=index, column=1, sticky='w', padx=5, pady=5)
-                value = prop.get('value', prop['default_value'])
-                if value:
-                    entry.insert(0, value)
-                prop['widget'] = entry
+    def create_ui(self):
+        raise NotImplementedError("Subclasses must implement this method.")
 
-            elif prop['property_type'] == 'directory':
-                frame = tk.Frame(self)
-                frame.grid(row=index, column=1, sticky='w', padx=5, pady=5)
+    def get_value(self):
+        raise NotImplementedError("Subclasses must implement the 'get_value' method")
 
-                entry = tk.Entry(frame)
-                entry.pack(side=tk.LEFT)
-                value = prop.get('value', prop['default_value'])
-                if value:
-                    entry.insert(0, value)
-                prop['widget'] = entry
+class StringPropertyEditor(PropertyEditor):
+    def __init__(self, panel, prop, index):
+        super().__init__(panel, prop, index)
 
-                button = tk.Button(frame, text='...', command=lambda p=prop: self.browse_directory(p))
-                button.pack(side=tk.LEFT, padx=(5, 0))
+    def create_ui(self):
+        entry = tk.Entry(self.panel)
+        entry.grid(row=0, column=1, sticky='w', padx=5, pady=5)
+        value = self.prop.get('value', self.prop['default_value'])
+        if value:
+            entry.insert(0, value)
+        self.prop['widget'] = entry
 
-        save_button = tk.Button(self, text='Save', command=self.save)
-        save_button.grid(row=index+1, column=0, columnspan=2, pady=10)
+    def get_value(self):
+        return self.prop['widget'].get()
 
+class DirectoryPropertyEditor(PropertyEditor):
 
-        # Get main window's geometry
-        main_x = root.winfo_x()
-        main_y = root.winfo_y()
-        main_width = root.winfo_width()
-        main_height = root.winfo_height()
+    def __init__(self, panel, prop, index):
+        super().__init__(panel, prop, index)
 
-        # Wait for the dialog to get its dimensions
-        self.update_idletasks()
+    def create_ui(self):
+        frame = tk.Frame(self.panel)
+        frame.grid(row=0, column=1, sticky='w', padx=5, pady=5)
 
-        # Calculate the position to center the About dialog over the main window
-        about_width = self.winfo_width()
-        about_height = self.winfo_height()
-        pos_x = main_x + (main_width // 2) - (about_width // 2)
-        pos_y = main_y + (main_height // 2) - (about_height // 2)
+        entry = tk.Entry(frame)
+        entry.pack(side=tk.LEFT)
+        value = self.prop.get('value', self.prop['default_value'])
+        if value:
+            entry.insert(0, value)
+        self.prop['widget'] = entry
 
-        # Set the About dialog's position
-        self.geometry(f"+{pos_x}+{pos_y}")
+        button = tk.Button(frame, text='...', command=self.browse_directory)
+        button.pack(side=tk.LEFT, padx=(5, 0))
 
-
-    def browse_directory(self, prop):
+    def browse_directory(self):
         directory = filedialog.askdirectory()
         if directory:
-            prop['widget'].delete(0, tk.END)
-            prop['widget'].insert(0, directory)
+            self.prop['widget'].delete(0, tk.END)
+            self.prop['widget'].insert(0, directory)
 
-    def save(self):
-        for prop in self.properties:
-            prop['value'] = prop['widget'].get()
+    def get_value(self):
+        return self.prop['widget'].get()
+    
+class FilenamePropertyEditor(PropertyEditor):
 
-        self.config.save()
+    def __init__(self, panel, prop, index):
+        super().__init__(panel, prop, index)
 
-        self.destroy()
+    def create_ui(self):
+        frame = tk.Frame(self.panel)
+        frame.grid(row=0, column=1, sticky='w', padx=5, pady=5)
+
+        entry = tk.Entry(frame)
+        entry.pack(side=tk.LEFT)
+        value = self.prop.get('value', self.prop['default_value'])
+        if value:
+            entry.insert(0, value)
+        self.prop['widget'] = entry
+
+        button = tk.Button(frame, text='...', command=self.browse_file)
+        button.pack(side=tk.LEFT, padx=(5, 0))
+
+    def browse_file(self):
+        filetypes = self.prop.get('filetypes', [('All Files', '*.*')])
+        initialdir = self.prop.get('initialdir', os.path.expanduser("~"))
+        filename = filedialog.askopenfilename(initialdir=initialdir, filetypes=filetypes)
+        if filename:
+            self.prop['widget'].delete(0, tk.END)
+            self.prop['widget'].insert(0, filename)    
+
+    def get_value(self):
+        return self.prop['widget'].get()
+    
+class CheckboxPropertyEditor(PropertyEditor):
+
+    def __init__(self, panel, prop, index):
+        super().__init__(panel, prop, index)
+
+    def create_ui(self):
+                        
+        value = self.prop.get('value', self.prop['default_value'])
+        self.var = tk.BooleanVar()
+
+        if value is not None:
+            self.var.set(value)
+        else:
+            self.var.set(False)
+
+        checkbox = tk.Checkbutton(self.panel, variable=self.var, text=self.prop['prompt'])
+        checkbox.grid(row=0, column=1, sticky='w', padx=5, pady=5)
+        self.prop['widget'] = checkbox
+
+    def get_value(self):
+        return self.var.get()
+
+class RadioSelectPropertyEditor(PropertyEditor):
+
+    def __init__(self, panel, prop, index):
+        super().__init__(panel, prop, index)
+
+    def create_ui(self):
+        options = self.prop['options']
+        var = tk.StringVar()
+        var.set(self.prop.get('value', self.prop['default_value']))
+
+        for index, option in enumerate(options):
+            radio = tk.Radiobutton(self.panel, text=option, variable=var, value=option)
+            radio.grid(row=0, column=1 + index, sticky='w', padx=(5 if index == 0 else 0), pady=5)
+
+        self.prop['widget'] = var
+    
+    def get_value(self):
+        return self.prop['widget'].get()

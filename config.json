@@ -1,0 +1,10 @@
+{
+  "NightHawk": {
+    "download_folder": "E:/dev/nighthawk/downloads",
+    "video_codec": "avc1",
+    "project_name": "The Why Files",
+    "project_directory": "E:/dev/nighthawk",
+    "enable_feature": true,
+    "color": "Green"
+  }
+}

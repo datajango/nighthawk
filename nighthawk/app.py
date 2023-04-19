@@ -14,32 +14,9 @@ from tkinter import messagebox, simpledialog, filedialog
 from pytube import YouTube
 from merge_audio_and_video import merge_audio_video_files
 from config import Config
-from nighthawk.property_editor import PropertyEditor
+from nighthawk.property_editor_dialog import PropertyEditorDialog
 from nighthawk.show_about import show_about
 
-# properties = [
-#     {
-#         'section': 'NightHawk',
-#         'key': 'download_folder',
-#         'property_type': 'directory',
-#         'prompt': 'Enter the download folder:',
-#         'value': None,
-#         'default_value': './downloads'
-#     },
-#     {
-#         'section': 'NightHawk',
-#         'key': 'video_codec',
-#         'property_type': 'string',
-#         'prompt': 'Enter the video codec:',
-#         'value': None,
-#         'default_value': 'avc1'
-#     }
-# ]
-
-# def load_properties_from_file(filepath):
-#     with open(filepath, 'r') as file:
-#         properties = json.load(file)
-#     return properties
 
 def load_properties_from_file(filename):
     base_path = os.path.dirname(os.path.abspath(__file__))
@@ -168,15 +145,14 @@ def about():
     about_dialog.transient(root)
 
 def edit_properties(properties, config):
-    editor = PropertyEditor(root, properties, config)
-    root.wait_window(editor)
+    editor = PropertyEditorDialog(root, properties, config)
     print("Updated properties:", properties)
     
 properties_file = 'properties.json'
 properties = load_properties_from_file(properties_file)
 
 # Create a config object
-config_file = 'config.ini'
+config_file = 'config.json'
 config = Config(config_file, properties)
 
 root = tk.Tk()
