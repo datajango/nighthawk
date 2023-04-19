@@ -1,6 +1,6 @@
 # Night Hawk
 
-![qIZtpvdMMWG4qre0bni6--2--tmiu8](E:\dev\nighthawk\qIZtpvdMMWG4qre0bni6--2--tmiu8.jpg)
+![qIZtpvdMMWG4qre0bni6--2--tmiu8](./qIZtpvdMMWG4qre0bni6--2--tmiu8.jpg)
 
 Night Hawk is a simple Video Downloader. It is a simple GUI application that allows you to download videos. It is written in Python and uses the TkInter library. This application was written for the purpose of learning and experimenting with Python.
 
