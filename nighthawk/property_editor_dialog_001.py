@@ -12,11 +12,39 @@ class PropertyEditorDialog(tk.Toplevel, CenteredDialogMixin):
         self.properties = properties
         self.editors = []
 
+
+         # Create main frame with grid layout
+        main_frame = tk.Frame(self, bg="white")
+        main_frame.grid(row=0, column=0, sticky='nsew')
+        self.grid_columnconfigure(0, weight=1)
+        self.grid_rowconfigure(0, weight=1)
+
+        # Create canvas with scrollbar
+        self.canvas = tk.Canvas(main_frame, bg="grey", highlightthickness=0)
+        #self.canvas.create_window((0, 0), window=canvas_frame, anchor="nw", tags="canvas_frame")
+        self.canvas.grid(row=0, column=0, sticky="nsew")
+        self.canvas.grid_columnconfigure(0, weight=1)  # Add this line
+        
+        v_scrollbar = tk.Scrollbar(main_frame, orient=tk.VERTICAL, command=self.canvas.yview)
+        self.canvas.configure(yscrollcommand=v_scrollbar.set)
+        
+        v_scrollbar.grid(row=0, column=1, sticky='ns')
+        self.canvas.grid(row=0, column=0, sticky='nswe')
+
+        # Configure row and column weights of main_frame
+        main_frame.grid_rowconfigure(0, weight=1)
+        main_frame.grid_columnconfigure(0, weight=1)
+
+        # Create a frame inside the canvas
+        self.scrollable_frame = tk.Frame(self.canvas)
+        self.canvas.create_window(0, 0, window=self.scrollable_frame, anchor='nw')
+
+
         for index, prop in enumerate(self.properties):
 
-            panel = tk.Frame(self, borderwidth=1, relief=tk.SUNKEN)
-            panel.grid(row=index, column=0, columnspan=2, sticky='ew', padx=5, pady=5)
-
+            panel = tk.Frame(self.scrollable_frame, borderwidth=1, relief=tk.SUNKEN)
+            panel.grid(row=index, column=0, columnspan=2, sticky='nsew', padx=5, pady=5)            
+            
             label = tk.Label(panel, text=prop['prompt'])
             label.grid(row=0, column=0, sticky='en', padx=5, pady=5)
 
@@ -50,36 +78,32 @@ class PropertyEditorDialog(tk.Toplevel, CenteredDialogMixin):
             else:
                 self.editors.append(prop_editor)
                 prop['prop_editor'] = prop_editor  # Store the PropertyEditor instance in the prop dictionary
+                #prop_editor.grid(row=0, column=1, sticky='ew', padx=5, pady=5)  # Modify the sticky option
 
 
+        # Bind the function to update the scrollregion
+        self.scrollable_frame.bind("<Configure>", self.update_scrollregion)
 
-        save_button = tk.Button(self, text='Save', command=self.save)
-        save_button.grid(row=index+1, column=0, columnspan=2, pady=10)
 
-        cancel_button = tk.Button(self, text='Cancel', command=self.cancel)
-        cancel_button.grid(row=index+1, column=1, pady=10)
+        # Add button container below the canvas
+        button_container = tk.Frame(main_frame)
+        button_container.grid(row=1, column=0, columnspan=2)
+
+        save_button = tk.Button(button_container, text='Save', command=self.save)
+        save_button.grid(row=0, column=0, pady=10)
+
+        cancel_button = tk.Button(button_container, text='Cancel', command=self.cancel)
+        cancel_button.grid(row=0, column=1, pady=10)
 
         self.protocol("WM_DELETE_WINDOW", self.cancel)
         self.grab_set()
         self.center_over_master()
         self.wait_window(self)
 
+    def update_scrollregion(self, event):
+        self.canvas.configure(scrollregion=self.canvas.bbox("all"))
 
     def save(self):
-        # for prop in self.properties:
-        #     # prop['value'] = prop['widget'].get()
-
-        #     # # Convert non-string values to strings
-        #     # if prop['property_type'] in ['integer', 'float', 'boolean', 'list']:
-        #     #     prop['value'] = str(prop['value'])
-
-        #     prop_editor = prop.get('property_editor')
-        #     if prop_editor:
-        #         prop['value'] = prop_editor.get_value()
-        #     else:
-        #         prop['value'] = prop['widget'].get()
-        #     self.config.set(prop['section'], prop['key'], prop['value'])
-
         for prop in self.properties:
             if prop.get('property_type') not in ['label', 'separator']:
                 prop['value'] = prop['prop_editor'].get_value()

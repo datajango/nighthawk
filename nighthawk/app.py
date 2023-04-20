@@ -14,7 +14,7 @@ from tkinter import messagebox, simpledialog, filedialog
 from pytube import YouTube
 from merge_audio_and_video import merge_audio_video_files
 from config import Config
-from nighthawk.property_editor_dialog import PropertyEditorDialog
+from nighthawk.property_editor_dialog_001 import PropertyEditorDialog
 from nighthawk.show_about import show_about
 
 

@@ -8,6 +8,11 @@ class PropertyEditor():
         self.panel = panel
         self.prop = prop
         self.index = index
+
+        self.container = tk.Frame(panel)
+        self.container.grid(row=0, column=1, sticky='ew', padx=5, pady=5)
+        self.container.grid_columnconfigure(0, weight=1)  # Add this line
+    
         self.create_ui()
 
     def create_ui(self):
@@ -21,15 +26,29 @@ class StringPropertyEditor(PropertyEditor):
         super().__init__(panel, prop, index)
 
     def create_ui(self):
-        entry = tk.Entry(self.panel)
-        entry.grid(row=0, column=1, sticky='w', padx=5, pady=5)
-        value = self.prop.get('value', self.prop['default_value'])
-        if value:
-            entry.insert(0, value)
-        self.prop['widget'] = entry
+        value = self.prop.get('value', '')
+        self.var = tk.StringVar(value=value)
+        self.entry = tk.Entry(self.container, textvariable=self.var, width=1)
+        self.entry.pack(fill='both', expand=True)
+        
+        #self.entry.grid(row=0, column=1, sticky='ew', padx=5, pady=5)  # Modify the sticky option
+        #self.panel.grid_columnconfigure(1, weight=1)  # Add this line
 
     def get_value(self):
-        return self.prop['widget'].get()
+        return self.var.get()
+
+    # def create_ui(self):
+    #     entry = tk.Entry(self.panel)
+    #     entry.grid(row=0, column=1, sticky='ew', padx=5, pady=5)        
+    #     self.panel.grid_columnconfigure(1, weight=1)  # Add this line
+        
+    #     value = self.prop.get('value', self.prop['default_value'])
+    #     if value:
+    #         entry.insert(0, value)
+    #     self.prop['widget'] = entry
+
+    # def get_value(self):
+    #     return self.prop['widget'].get()
 
 class DirectoryPropertyEditor(PropertyEditor):
 
@@ -37,17 +56,15 @@ class DirectoryPropertyEditor(PropertyEditor):
         super().__init__(panel, prop, index)
 
     def create_ui(self):
-        frame = tk.Frame(self.panel)
-        frame.grid(row=0, column=1, sticky='w', padx=5, pady=5)
 
-        entry = tk.Entry(frame)
+        entry = tk.Entry(self.container)
         entry.pack(side=tk.LEFT)
         value = self.prop.get('value', self.prop['default_value'])
         if value:
             entry.insert(0, value)
         self.prop['widget'] = entry
 
-        button = tk.Button(frame, text='...', command=self.browse_directory)
+        button = tk.Button(self.container, text='...', command=self.browse_directory)
         button.pack(side=tk.LEFT, padx=(5, 0))
 
     def browse_directory(self):
@@ -65,17 +82,15 @@ class FilenamePropertyEditor(PropertyEditor):
         super().__init__(panel, prop, index)
 
     def create_ui(self):
-        frame = tk.Frame(self.panel)
-        frame.grid(row=0, column=1, sticky='w', padx=5, pady=5)
 
-        entry = tk.Entry(frame)
+        entry = tk.Entry(self.container)
         entry.pack(side=tk.LEFT)
         value = self.prop.get('value', self.prop['default_value'])
         if value:
             entry.insert(0, value)
         self.prop['widget'] = entry
 
-        button = tk.Button(frame, text='...', command=self.browse_file)
+        button = tk.Button(self.container, text='...', command=self.browse_file)
         button.pack(side=tk.LEFT, padx=(5, 0))
 
     def browse_file(self):
@@ -104,7 +119,7 @@ class CheckboxPropertyEditor(PropertyEditor):
         else:
             self.var.set(False)
 
-        checkbox = tk.Checkbutton(self.panel, variable=self.var, text=self.prop['prompt'])
+        checkbox = tk.Checkbutton(self.container, variable=self.var, text=self.prop['prompt'])
         checkbox.grid(row=0, column=1, sticky='w', padx=5, pady=5)
         self.prop['widget'] = checkbox
 
@@ -122,7 +137,7 @@ class RadioSelectPropertyEditor(PropertyEditor):
         var.set(self.prop.get('value', self.prop['default_value']))
 
         for index, option in enumerate(options):
-            radio = tk.Radiobutton(self.panel, text=option, variable=var, value=option)
+            radio = tk.Radiobutton(self.container, text=option, variable=var, value=option)
             radio.grid(row=0, column=1 + index, sticky='w', padx=(5 if index == 0 else 0), pady=5)
 
         self.prop['widget'] = var
